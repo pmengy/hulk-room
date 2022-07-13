@@ -6,7 +6,8 @@ import 'amfe-flexible/index.min.js'
 // 引入vant
 import Vant from 'vant'
 import 'vant/lib/index.css'
-
+// 引入iconfont
+import '@/assets/fonts/iconfont.css'
 Vue.config.productionTip = false
 
 Vue.use(Vant)
