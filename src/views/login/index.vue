@@ -4,7 +4,7 @@
       class="navbar"
       title="账号登录"
       left-arrow
-      @click-left="onClickLeft"
+      @click-left="$router.back()"
     />
     <van-form @submit="login" class="form">
       <van-field

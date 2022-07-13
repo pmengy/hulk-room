@@ -7,6 +7,17 @@ const routes = [
   {
     path: '/login',
     component: () => import('@/views/login')
+  },
+  { path: '/', redirect: '/home' },
+  {
+    path: '/home',
+    component: () => import('@/views/layout'),
+    children: [
+      { path: '', component: () => import('@/views/home') },
+      { path: 'profile', component: () => import('@/views/my') },
+      { path: 'list', component: () => import('@/views/find') },
+      { path: 'news', component: () => import('@/views/news') }
+    ]
   }
 ]
 
