@@ -58,6 +58,7 @@ export default {
         const { data } = await login(this.username, this.password)
         this.$store.commit('setUser', data.body.token)
         this.$toast.success('登录成功')
+        this.$router.back()
       } catch (err) {
         console.log(err)
         if (err.response.status === 401) {

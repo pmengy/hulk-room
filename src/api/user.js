@@ -7,3 +7,10 @@ export const login = (username, password) => {
     data: { username, password }
   })
 }
+
+// 获取获取用户的信息资料
+export const getUserInfo = () => {
+  return request({
+    url: 'user'
+  })
+}
