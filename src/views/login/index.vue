@@ -45,27 +45,20 @@ export default {
   mounted() {},
 
   methods: {
-    onClickLeft() {
-      console.log(1)
-    },
     async login() {
       this.$toast.loading({
         message: '登录中...',
         forbidClick: true, // 禁用背景点击
         duration: 0 // 持续时间，默认2s，如果为0则持续展示
       })
-      try {
-        const { data } = await login(this.username, this.password)
+
+      const { data } = await login(this.username, this.password)
+      if (data.status === 400) {
+        this.$toast.fail('账号或密码错误')
+      } else {
         this.$store.commit('setUser', data.body.token)
         this.$toast.success('登录成功')
-        this.$router.back()
-      } catch (err) {
-        console.log(err)
-        if (err.response.status === 401) {
-          this.$toast.fail('账号或密码错误')
-        } else {
-          this.$toast.fail('登录失败')
-        }
+        this.$router.push('/home/profile')
       }
     }
   }

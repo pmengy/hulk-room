@@ -28,19 +28,27 @@ export default {
 
   data() {
     return {
-      level: 1
+      level: 1,
+      cityList: []
+      // cityNameList: []
     }
   },
 
   created() {
     this.getCityList(this.level)
+    // this.getCityNameList()
   },
 
   methods: {
     async getCityList(level) {
       const res = await getCityList(level)
-      console.log(res)
+      this.cityList = res.data.body
     }
+    // getCityNameList() {
+    //   for (const p in this.cityList) {
+    //     this.cityNameList.push(this.cityList[p].name)
+    //   }
+    // }
   }
 }
 </script>

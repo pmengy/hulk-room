@@ -10,6 +10,8 @@ const routes = [
   },
   { path: '/', redirect: '/home' },
   { path: '/city', component: () => import('@/views/city') },
+  { path: '/favorite', component: () => import('@/views/favorite') },
+  { path: '/rent', component: () => import('@/views/rent') },
   {
     path: '/home',
     component: () => import('@/views/layout'),

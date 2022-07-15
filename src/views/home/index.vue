@@ -103,7 +103,7 @@ export default {
       }
     },
     getCityList() {
-      this.$router.replace('/city')
+      this.$router.push('/city')
     },
     async getGroups(area) {
       try {
