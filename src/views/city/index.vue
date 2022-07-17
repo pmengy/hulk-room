@@ -1,70 +1,159 @@
 <template>
   <div>
-    <van-nav-bar
-      class="navbar"
-      title="城市列表"
-      left-arrow
-      @click-left="$router.back()"
-    />
-    <van-index-bar>
-      <van-index-anchor index="当前城市" />
-      <van-cell title="文本" />
-
-      <van-index-anchor index="热门城市" />
-      <van-cell title="文本" />
-
-      <van-index-anchor index="A" />
-      <van-cell title="文本" />
-      <van-cell title="文本" />
-      <van-cell title="文本" />
+    <div class="city-title">
+      <van-nav-bar
+        title="城市列表"
+        left-arrow
+        @click-left="$router.push('/home/')"
+      />
+    </div>
+    <van-index-bar :index-list="indexList" :sticky="false">
+      <div class="div" v-for="(val, index) in indexList" :key="index">
+        <van-index-anchor :index="val">
+          {{
+            val === '#' ? '当前城市' : val === '热' ? '热门城市' : val
+          }}</van-index-anchor
+        >
+        <van-cell
+          class="eachCity"
+          @click="handleCellClick(item)"
+          :title="item.label"
+          v-for="(item, index) in allCityList[val]"
+          :key="index"
+        />
+      </div>
     </van-index-bar>
   </div>
 </template>
 
 <script>
-import { getCityList } from '@/api/city'
+import { getCityList, getHotCityList } from '@/api/city'
+import { mapState } from 'vuex'
 export default {
   name: 'city',
 
   data() {
     return {
-      level: 1,
-      cityList: []
-      // cityNameList: []
+      indexList: ['#', '热'],
+      hotCityList: [],
+      allCityList: {}
     }
   },
 
   created() {
-    this.getCityList(this.level)
-    // this.getCityNameList()
+    this.getAllCityList()
   },
 
   methods: {
-    async getCityList(level) {
-      const res = await getCityList(level)
-      this.cityList = res.data.body
+    async getCityList() {
+      try {
+        const {
+          data: { body }
+        } = await getCityList(1)
+        const cityList = {}
+        body.forEach((item) => {
+          const first = item.short.substr(0, 1).toUpperCase()
+          if (cityList[first]) {
+            cityList[first].push(item)
+          } else {
+            cityList[first] = [item]
+          }
+        })
+        this.allCityList = { ...this.allCityList, ...cityList }
+        const allCityListIndex = Object.keys(cityList).sort()
+        this.indexList = [...this.indexList, ...allCityListIndex]
+      } catch (error) {}
+    },
+    async getAllCityList() {
+      this.$toast.loading({
+        message: '加载中...',
+        forbidClick: true
+      })
+      try {
+        const res = await getHotCityList()
+        this.hotCityList = res.data.body
+        this.allCityList = {
+          ...this.allCityList,
+          热: [...this.hotCityList],
+          '#': [{ ...this.currentCity }]
+        }
+        this.getCityList()
+      } catch (error) {
+        this.$toast('获取城市列表失败')
+      }
+    },
+    handleCellClick(val) {
+      const result = this.hotCityList.some((item) => item.label === val.label)
+      if (result) {
+        this.$store.commit('setCurrentCity', val)
+        this.$router.push('/home/')
+      } else {
+        this.$toast('该城市暂无房源')
+      }
     }
-    // getCityNameList() {
-    //   for (const p in this.cityList) {
-    //     this.cityNameList.push(this.cityList[p].name)
-    //   }
-    // }
+  },
+  computed: {
+    ...mapState(['currentCity'])
   }
 }
 </script>
 
 <style lang="less" scoped>
-.navbar {
-  margin-bottom: 0px;
+.city-title {
   :deep(.van-nav-bar__content) {
     background-color: #21b97a;
-    font-size: 30px;
   }
   :deep(.van-nav-bar__title) {
+    font-size: 36px;
+    color: #fff;
+  }
+  :deep(.van-nav-bar__arrow) {
     color: #fff;
   }
 }
-:deep(.van-nav-bar .van-icon) {
-  color: #fff !important;
+.van-index-bar {
+  box-sizing: border-box;
+  height: 1244px;
+  width: 750px;
+  overflow: hidden auto;
+  :deep(.van-index-anchor) {
+    font-size: 28px;
+    color: #999;
+    border-top:2px solid #ededed ;
+  }
+}
+:deep(.van-index-bar__sidebar) {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  top: 53%;
+  right: 5px;
+  z-index: 3;
+  height: 90%;
+  box-sizing: border-box;
+  padding-top: 20px;
+  text-align: center;
+  cursor: pointer;
+  .van-index-bar__index {
+    padding: 0;
+    flex: 1;
+    font-size: 28px;
+    width: 30px;
+    border-radius: 50%;
+    box-sizing: border-box;
+    margin: 14px 0;
+    text-align: center;
+  }
+}
+.van-cell::after {
+  border-bottom: 4px solid #ededed;
+}
+.van-cell__title {
+  font-size: 32px;
+  color: #333;
+}
+:deep(.van-index-bar__index--active) {
+  background-color: #21b97a !important;
+  color: #fff;
 }
 </style>

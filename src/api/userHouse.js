@@ -5,3 +5,10 @@ export const getFavoriteHouses = () => {
     url: 'user/favorites'
   })
 }
+
+// 查询房屋具体信息
+export const getHouseDetails = (id) => {
+  return request({
+    url: `/houses/${id}`
+  })
+}
