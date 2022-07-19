@@ -17,6 +17,7 @@
     <!-- 列表区域 -->
     <van-card
       v-else
+      @click="$router.push(`/detail/${item.houseCode}`)"
       currency=""
       v-for="item in favoriteList"
       :key="item.houseCode"

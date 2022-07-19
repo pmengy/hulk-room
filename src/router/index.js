@@ -12,7 +12,7 @@ const routes = [
   { path: '/city', component: () => import('@/views/city') },
   { path: '/favorite', component: () => import('@/views/favorite') },
   { path: '/rent', component: () => import('@/views/rent') },
-  { path: '/detail', component: () => import('@/views/rent') },
+  { path: '/detail/:id', component: () => import('@/views/house') },
   {
     path: '/home',
     component: () => import('@/views/layout'),

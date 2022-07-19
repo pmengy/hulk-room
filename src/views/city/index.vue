@@ -8,7 +8,7 @@
       />
     </div>
     <van-index-bar :index-list="indexList" :sticky="false">
-      <div class="div" v-for="(val, index) in indexList" :key="index">
+      <div v-for="(val, index) in indexList" :key="index">
         <van-index-anchor :index="val">
           {{
             val === '#' ? '当前城市' : val === '热' ? '热门城市' : val
@@ -61,6 +61,7 @@ export default {
         })
         this.allCityList = { ...this.allCityList, ...cityList }
         const allCityListIndex = Object.keys(cityList).sort()
+        console.log(cityList)
         this.indexList = [...this.indexList, ...allCityListIndex]
       } catch (error) {}
     },
