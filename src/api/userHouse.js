@@ -12,3 +12,26 @@ export const getHouseDetails = (id) => {
     url: `/houses/${id}`
   })
 }
+
+// 取消收藏房屋
+export const cancelFavoriteHouse = (id) => {
+  return request({
+    url: `/user/favorites/${id}`,
+    method: 'DELETE'
+  })
+}
+
+// 房屋是否收藏
+export const checkFavoriteHouse = (id) => {
+  return request({
+    url: `/user/favorites/${id}`
+  })
+}
+
+// 添加收藏房屋
+export const addFavoriteHouse = (id) => {
+  return request({
+    url: `/user/favorites/${id}`,
+    method: 'POST'
+  })
+}

@@ -3,7 +3,7 @@
     <!-- 头部区域 -->
     <div class="detail-title">
       <van-nav-bar
-        :title="houseInfo.community ? houseInfo.community : '房屋信息'"
+        :title="houseInfo?.community ? houseInfo.community : '房屋信息'"
         left-arrow
         @click-left="$router.push('/favorite')"
       />
@@ -11,7 +11,7 @@
     <!-- 房屋图片轮播图 -->
     <div class="swiper-container">
       <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
-        <van-swipe-item v-for="item in houseInfo.houseImg" :key="item">
+        <van-swipe-item v-for="item in houseInfo?.houseImg" :key="item">
           <img :src="`http://liufusong.top:8080${item}`" alt="" />
         </van-swipe-item>
       </van-swipe>
@@ -20,7 +20,7 @@
     <div class="detail-info">
       <!-- 标题 -->
       <div class="title">
-        {{ houseInfo.community ? houseInfo.community : '' }}
+        {{ houseInfo?.community ? houseInfo.community : '' }}
         <div>
           <!-- {{houseInfo.tags[0]}} -->
           <van-tag color="#e1f5f8" text-color="#50c1ce" size="large"
@@ -32,16 +32,16 @@
       <div class="house-size">
         <van-grid :column-num="3" :border="false">
           <van-grid-item text="租金">
-            <template #icon> {{ houseInfo.price }}<span>/月</span> </template>
+            <template #icon> {{ houseInfo?.price }}<span>/月</span> </template>
           </van-grid-item>
           <van-grid-item text="房型">
             <template #icon>
-              {{ houseInfo.roomType ? houseInfo.roomType : '尚无数据' }}
+              {{ houseInfo?.roomType ? houseInfo.roomType : '尚无数据' }}
             </template>
           </van-grid-item>
           <van-grid-item text="面积">
             <template #icon>
-              {{ houseInfo.size ? houseInfo.size : '尚无数据' }}
+              {{ houseInfo?.size ? houseInfo.size : '尚无数据' }}
             </template>
           </van-grid-item>
         </van-grid>
@@ -72,7 +72,7 @@
           <h4>房屋配套</h4>
         </div>
         <van-grid :border="false" :column-num="5">
-          <van-grid-item v-for="item in houseInfo.supporting" :key="item">
+          <van-grid-item v-for="item in houseInfo?.supporting" :key="item">
             <div class="each-item">
               <i class="iconfont" v-html="supportings[item]"></i>
               <p>{{ item }}</p>
@@ -164,7 +164,14 @@
         clickable
         class="grid"
       >
-        <van-grid-item icon="star-o" text="收藏" class="like" />
+        <!-- :icon="isFavorite ? 'star' : 'star-o'" -->
+        <van-grid-item text="收藏" class="like" @click="clickStar">
+          <template #icon>
+            <van-icon
+              :name="isFavorite ? 'star' : 'star-o'"
+              :color="isFavorite ? 'red' : 'black'"
+            /> </template
+        ></van-grid-item>
         <van-grid-item text="在线咨询" class="online" />
         <van-grid-item text="电话预约" class="phone" />
       </van-grid>
@@ -173,7 +180,12 @@
 </template>
 
 <script>
-import { getHouseDetails } from '@/api/userHouse'
+import {
+  getHouseDetails,
+  cancelFavoriteHouse,
+  checkFavoriteHouse,
+  addFavoriteHouse
+} from '@/api/userHouse'
 export default {
   name: 'HouseDetail',
 
@@ -191,19 +203,52 @@ export default {
         暖气: '&#xe610;',
         床: '&#xe662;',
         热水器: '&#xe611;'
-      }
+      },
+      isFavorite: true,
+      id: this.$router.currentRoute.params.id
     }
   },
 
   created() {
     this.getHouseDetails()
+    this.checkFavoriteHouse()
   },
 
   methods: {
     async getHouseDetails() {
-      const id = this.$router.currentRoute.params.id
-      const { data } = await getHouseDetails(id)
-      this.houseInfo = data.body
+      try {
+        const { data } = await getHouseDetails(this.id)
+        this.houseInfo = data.body
+      } catch (error) {
+        this.$toast('获取数据失败,请刷新重试')
+      }
+    },
+    async checkFavoriteHouse() {
+      try {
+        const { data } = await checkFavoriteHouse(this.id)
+        this.isFavorite = data.body.isFavorite
+      } catch (error) {
+        this.$toast('网络不太稳定')
+      }
+    },
+    async clickStar() {
+      if (this.isFavorite) {
+        const res = await cancelFavoriteHouse(this.id)
+        this.isFavorite = false
+        if (res.data.status === 200) {
+          this.$toast('取消收藏成功')
+        } else {
+          this.$toast('取消收藏失败')
+        }
+      } else {
+        const res = await addFavoriteHouse(this.id)
+        this.isFavorite = true
+        if (res.data.status === 200) {
+          this.$toast('添加收藏成功')
+        } else {
+          this.$toast('添加收藏失败')
+        }
+      }
     }
   }
 }
